@@ -36,7 +36,7 @@ Many pathfinding algorithm
 
 运行Pathfinding场景，选中Search这个物体，然后其Inspector面板中选择想要的寻路算法，按空格键来运行算法
 
-<img src="<https://github.com/KaimaChen/Pathfinding/blob/master/Doc/Search_go.png>" width = "200" height = "300" alt="" align=center />
+<img src="https://github.com/KaimaChen/Pathfinding/blob/master/Doc/Search_go.png" width = "200" height = "300" alt="" align=center />
 
 ### 网格操作
 
