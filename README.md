@@ -19,6 +19,7 @@ Many pathfinding algorithm
   * LPA*
   * D* Lite
   * Path Adaptive A*
+  * Tree Adaptive A*
 * Moving Target
   * GAA*
   * G-FRA*

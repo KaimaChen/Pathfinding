@@ -24,6 +24,7 @@ public class Path_AAStar : BaseSearchAlgo
     {
         m_start = m_mapStart;
         m_goal = m_mapGoal;
+        m_increaseCostNodes.Clear();
 
         m_iteration = 1;
         ForeachNode((s) =>

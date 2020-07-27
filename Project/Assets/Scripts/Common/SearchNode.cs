@@ -1,6 +1,5 @@
-﻿using UnityEngine;
-using UnityEditor;
-using System;
+﻿using UnityEditor;
+using UnityEngine;
 
 public class SearchNode : BaseNode
 {
@@ -66,21 +65,32 @@ public class SearchNode : BaseNode
     {
         Handles.color = Color.black;
 
-        bool useBackState = SearchGrid.Instance.m_searchAlgo == SearchAlgo.Path_AA_Star;
-
         int max = 100;
         SearchNode curt = this;
-        SearchNode prev = useBackState ? m_backState : m_parent;
-        while(curt != null && prev != null && --max > 0)
+        SearchNode linkNode = FindLink(this);
+        while(curt != null && linkNode != null && --max > 0)
         {
-            Handles.DrawLine(curt.transform.position, prev.transform.position);
+            Handles.DrawLine(curt.transform.position, linkNode.transform.position);
 
-            curt = prev;
-            prev = useBackState ? prev.m_backState : prev.m_parent;
+            curt = linkNode;
+            linkNode = FindLink(linkNode);
         }
 
         if (max <= 0)
             Debug.LogError("画线怎么会超过100，是不是哪里出错了？");
+    }
+
+    private SearchNode FindLink(SearchNode s)
+    {
+        switch(SearchGrid.Instance.m_searchAlgo)
+        {
+            case SearchAlgo.Path_AA_Star:
+                return s.m_backState;
+            case SearchAlgo.Tree_AA_Star:
+                return s.m_reusabletree;
+            default:
+                return s.Parent;
+        }
     }
 
     public override void Init(int x, int y, byte cost)
@@ -371,6 +381,23 @@ public class SearchNode : BaseNode
     {
         get { return m_backState; }
         set { m_backState = value; }
+    }
+    #endregion
+
+    #region Tree Adaptive A*
+    private int m_id;
+    private SearchNode m_reusabletree;
+
+    public int Id
+    {
+        get { return m_id; }
+        set { m_id = value; }
+    }
+
+    public SearchNode Reusabletree
+    {
+        get { return m_reusabletree; }
+        set { m_reusabletree = value; }
     }
     #endregion
 }

@@ -230,6 +230,9 @@ public class SearchGrid : BaseGrid<SearchNode>
             case SearchAlgo.Path_AA_Star:
                 algo = new Path_AAStar(m_startNode, m_goalNode, m_nodes, m_showTime);
                 break;
+            case SearchAlgo.Tree_AA_Star:
+                algo = new Tree_AAStar(m_startNode, m_goalNode, m_nodes, m_showTime);
+                break;
             #endregion
 
             #region Moving Target

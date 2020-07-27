@@ -88,6 +88,7 @@ public enum SearchAlgo
 	LPA_Star,
 	DstarLite,
 	Path_AA_Star,
+	Tree_AA_Star,
 	//Moving Target
 	GAA_Star,
 	GFRA_Star,
