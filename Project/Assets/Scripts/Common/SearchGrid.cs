@@ -29,6 +29,10 @@ public class SearchGrid : BaseGrid<SearchNode>
     public SearchNode StartNode { get { return m_startNode; } }
 
     public SearchNode EndNode { get { return m_goalNode; } }
+
+    public int Width { get { return m_col; } }
+
+    public int Height { get { return m_row; } }
     #endregion
 
     protected override void Awake()

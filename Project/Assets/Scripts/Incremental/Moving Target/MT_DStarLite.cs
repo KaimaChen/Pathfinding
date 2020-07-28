@@ -4,6 +4,8 @@ using UnityEngine;
 
 /// <summary>
 /// Moving Target D* Lite
+/// 作用：处理动态环境+起点终点同时变化的情景
+/// 思路：D* Lite + G-FRA*
 /// </summary>
 public class MT_DStarLite : DStarLite
 {
@@ -35,6 +37,7 @@ public class MT_DStarLite : DStarLite
 
             List<SearchNode> path = GetPath();
             List<SearchNode> nearChanged = new List<SearchNode>();
+            //如果终点仍在路径上且环境没检测到变化，则继续往前走直到到达终点
             while(m_currPos != m_mapGoal && path.Contains(m_mapGoal) && nearChanged.Count <= 0)
             {
                 MoveOneStep(path, nearChanged);
@@ -51,7 +54,10 @@ public class MT_DStarLite : DStarLite
             m_km += c(oldGoal, m_currGoal);
 
             if (oldStart != m_currStart)
-                OptimizedDeletion();
+            {
+                //BasicDeletion(oldStart); //Basic MT-D* Lite
+                OptimizedDeletion(); //MT-D* Lite
+            }
 
             HandleChangedNode(nearChanged);
         }
@@ -59,11 +65,13 @@ public class MT_DStarLite : DStarLite
         yield break;
     }
 
+    //因为起点和终点都会发生变化，因此没必要进行反向寻路
     protected override SearchNode BeginNode()
     {
         return m_currStart;
     }
 
+    //因为起点和终点都会发生变化，因此没必要进行反向寻路
     protected override SearchNode EndNode()
     {
         return m_currGoal;
@@ -76,6 +84,16 @@ public class MT_DStarLite : DStarLite
         base.Initialize();
     }
 
+    private void BasicDeletion(SearchNode oldStart)
+    {
+        m_currStart.SetRhs(m_currStart.Rhs, null); //新起点的parent(这里是rhsSource)要按照起点的要求设置为空
+        UpdateVertex(oldStart); //将旧起点视为普通节点进行处理
+    }
+
+    /// <summary>
+    /// 利用G-FRA* 的思想进行优化
+    /// 尽早处理根不在当前起点的其他节点，而不是等到ComputeShortestPath再处理，因为那时就需要更多操作了
+    /// </summary>
     private void OptimizedDeletion()
     {
         m_deleted.Clear();
@@ -84,7 +102,8 @@ public class MT_DStarLite : DStarLite
         //类似FRA*的Step 2
         ForeachNode((s) =>
         {
-            if(IsInSearchTree(s) && IsSubRoot(s, BeginNode()))
+            //处理搜索树中不在根为当前起点的其他节点
+            if(IsInSearchTree(s) && IsSubRoot(s, BeginNode()) == false)
             {
                 s.SetRhs(c_large, null);
                 s.G = c_large;
@@ -106,6 +125,9 @@ public class MT_DStarLite : DStarLite
         }
     }
 
+    /// <summary>
+    /// 在OPEN或CLOSE的节点属于搜索树
+    /// </summary>
     private bool IsInSearchTree(SearchNode s)
     {
         return s.Opened || s.RhsSource != null;

@@ -5,25 +5,26 @@ Many pathfinding algorithm
 
 ## 包含的算法
 
-* Basic
+* 【Basic】
   * A*
   * BFS
   * Dijkstra
-* Bidirectional Search
+* 【Bidirectional Search】
   * Bidirection A*
-* Any-Angle Search
+* 【Any-Angle Search】
   * Theta*
     * Lazy Theta*
-* Incremental Search
+* 【Incremental Search】
   * D*
   * LPA*
   * D* Lite
   * Path Adaptive A*
   * Tree Adaptive A*
-* Moving Target
-  * GAA*
-  * G-FRA*
-* Other Search
+  * 【Moving Target】
+    * Generalized Adaptive A* (GAA*)
+  	* Generalized Fringe-Retrieving A* (G-FRA*)
+  	* Moving Target D* Lite (MT-D* Lite)
+* 【Other Search】
   * Flow Field
   * Jump Point Search
     - JPS Plus
@@ -35,8 +36,6 @@ Many pathfinding algorithm
 ### 选择算法
 
 运行Pathfinding场景，选中Search这个物体，然后其Inspector面板中选择想要的寻路算法，按空格键来运行算法
-
-<img src="https://github.com/KaimaChen/Pathfinding/blob/master/Doc/Search_go.png" width = "200" height = "300" alt="" align=center />
 
 ### 网格操作
 

@@ -152,7 +152,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   m_nodePrefab: {fileID: 1902866159556996, guid: 6ca41f8e1be07654cb5f54cca148faf8,
     type: 3}
-  m_searchAlgo: 15
+  m_searchAlgo: 18
   m_heuristicType: 2
   m_unitSize: 1
   m_weight: 1

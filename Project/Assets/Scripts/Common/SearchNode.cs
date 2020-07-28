@@ -65,10 +65,12 @@ public class SearchNode : BaseNode
     {
         Handles.color = Color.black;
 
-        int max = 100;
+        int max = SearchGrid.Instance.Width * SearchGrid.Instance.Height;
+        int counter = max;
+
         SearchNode curt = this;
         SearchNode linkNode = FindLink(this);
-        while(curt != null && linkNode != null && --max > 0)
+        while(curt != null && linkNode != null && --counter > 0)
         {
             Handles.DrawLine(curt.transform.position, linkNode.transform.position);
 
@@ -76,8 +78,8 @@ public class SearchNode : BaseNode
             linkNode = FindLink(linkNode);
         }
 
-        if (max <= 0)
-            Debug.LogError("画线怎么会超过100，是不是哪里出错了？");
+        if (counter <= 0)
+            Debug.LogErrorFormat("画线怎么会超过{0}，是不是哪里出错了？", max);
     }
 
     private SearchNode FindLink(SearchNode s)
@@ -88,8 +90,11 @@ public class SearchNode : BaseNode
                 return s.m_backState;
             case SearchAlgo.Tree_AA_Star:
                 return s.m_reusabletree;
+            case SearchAlgo.LPA_Star:
+            case SearchAlgo.MT_DstarLite:
+                return s.m_rhsSource;
             default:
-                return s.Parent;
+                return s.m_parent;
         }
     }
 

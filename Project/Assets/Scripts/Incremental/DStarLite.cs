@@ -16,7 +16,6 @@ public class DStarLite : LPAStar
 {
     protected float m_km = 0;
 
-    protected SearchNode m_oldEnd;
     protected SearchNode m_currStart;
     protected readonly int[,] m_foundMap; //目前通过传感器发现的地图
 
@@ -28,17 +27,17 @@ public class DStarLite : LPAStar
 
     public override IEnumerator Process()
     {
-        m_oldEnd = EndNode();
-
         Initialize();
         ComputeShortestPath();
 
         while (m_currStart != m_mapGoal)
         {
+            SearchNode oldEnd = EndNode();
+
             if (MoveOneStep() == false) //假设每次走一步
                 yield break; //如果没找到路径，则直接结束（实际使用时，因为传感器的范围有限，可能别的地方此时移除了障碍，因此可以让算法别这么快结束，让它再去别的地方找）
 
-            CheckNearChanged(); //看看附近有没有格子发生变化
+            CheckNearChanged(oldEnd); //看看附近有没有格子发生变化
 
             yield return new WaitForSeconds(m_showTime);
         }
@@ -86,8 +85,8 @@ public class DStarLite : LPAStar
         {
             LPAKey kOld = TopKey();
             SearchNode curtNode = PopOpenQueue();
-
             LPAKey kCurt = CalculateKey(curtNode);
+
             if(kOld < kCurt) //新的Key值更大，表示该Key值可能已经并不真的应该在顶层
             {
                 curtNode.LPAKey = kCurt;
@@ -148,7 +147,7 @@ public class DStarLite : LPAStar
         return true;
     }
 
-    protected void CheckNearChanged()
+    protected void CheckNearChanged(SearchNode oldEnd)
     {
         List<SearchNode> nearChanged = new List<SearchNode>();
 
@@ -166,8 +165,8 @@ public class DStarLite : LPAStar
 
         if(nearChanged.Count > 0)
         {
-            m_km += c(m_oldEnd, m_currStart);
-            m_oldEnd = m_currStart;
+            m_km += c(oldEnd, EndNode());
+            oldEnd = EndNode();
 
             HandleChangedNode(nearChanged);
         }
