@@ -63,6 +63,9 @@ public class SearchNode : BaseNode
 
     private void OnDrawGizmosSelected()
     {
+        if (Application.isPlaying == false)
+            return;
+
         Handles.color = Color.black;
 
         int max = SearchGrid.Instance.Width * SearchGrid.Instance.Height;
