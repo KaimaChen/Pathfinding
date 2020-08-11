@@ -10,7 +10,7 @@ public class HierarchicalMap : IMap
     public int MinClusterSize { get; }
     public int MaxLevel { get; }
 
-    private readonly List<Cluster> m_clusters = new List<Cluster>();
+    private Cluster[] m_clusters;
     private readonly Dictionary<Vector2Int, AbstractNode> m_concreteToAbstractNode = new Dictionary<Vector2Int, AbstractNode>();
 
     private int m_curtLevel;
@@ -32,6 +32,7 @@ public class HierarchicalMap : IMap
 
     public void InitClusters(List<Cluster> clusters)
     {
+        m_clusters = new Cluster[clusters.Count];
         for (int i = 0; i < clusters.Count; i++)
             m_clusters[clusters[i].Id] = clusters[i];
     }

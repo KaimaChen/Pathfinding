@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
 using UnityEngine;
@@ -16,7 +17,7 @@ public class HierarchicalMapFactory
     private int m_maxLevel;
 
     private readonly Dictionary<int, NodeBackup> m_backupDict = new Dictionary<int, NodeBackup>();
-    
+
     public HierarchicalMap CreateHierarchicalMap(ConcreteMap concreteMap, int clusterSize, int maxLevel)
     {
         m_concreteMap = concreteMap;
@@ -30,7 +31,7 @@ public class HierarchicalMapFactory
         m_hierarchicalMap.InitClusters(clusters);
 
         CreateAbstractNodes(entrances);
-        CreateEdges(clusters, entrances);
+        //CreateEdges(clusters, entrances);
         
         return m_hierarchicalMap;
     }
@@ -46,7 +47,7 @@ public class HierarchicalMapFactory
                 //创建Cluster
                 int width = Mathf.Min(m_clusterSize, m_concreteMap.Width - x);
                 int height = Mathf.Min(m_clusterSize, m_concreteMap.Height - y);
-                Cluster cluster = new Cluster(clusterId++, new Vector2Int(clusterX, clusterY), new Vector2Int(x, y), new Vector2Int(width, height), m_concreteMap);
+                Cluster cluster = CreateCluster(clusterId++, new Vector2Int(clusterX, clusterY), new Vector2Int(x, y), new Vector2Int(width, height));
                 clusterResult.Add(cluster);
                 //创建Entrance
                 Cluster leftCluster = clusterX > 0 ? GetCluster(clusterResult, clusterX - 1, clusterY) : null;
@@ -54,6 +55,13 @@ public class HierarchicalMapFactory
                 CreateEntrances(cluster, leftCluster, underCluster, entranceResult);
             }
         }
+    }
+
+    private Cluster CreateCluster(int id, Vector2Int pos, Vector2Int concretePos, Vector2Int size)
+    {
+        Cluster cluster = HPADemo.Instance.CreateCluster(pos);
+        cluster.Init(id, pos, concretePos, size, m_concreteMap);
+        return cluster;
     }
 
     private Cluster GetCluster(List<Cluster> clusters, int x, int y)
@@ -123,7 +131,10 @@ public class HierarchicalMapFactory
                 curtBegin = curt;
             }
 
-            if((prev.IsObstacle || curt.IsObstacle) && size > 0)
+            if (!prev.IsObstacle && !curt.IsObstacle)
+                size++;
+
+            if ((prev.IsObstacle || curt.IsObstacle || i == prevNodes.Count - 1) && size > 0)
             {
                 if(size >= c_maxEntranceSize)
                 {
@@ -149,10 +160,6 @@ public class HierarchicalMapFactory
                 prevBegin = curtBegin = null;
                 size = 0;
             }
-            else
-            {
-                size++;
-            }
         }
     }
     #endregion
@@ -160,7 +167,7 @@ public class HierarchicalMapFactory
     #region AbstractNode
     private void CreateAbstractNodes(List<Entrance> entrances)
     {
-        int abstractId = 1;
+        int abstractId = 0;
         Dictionary<Vector2Int, AbstractNode> abstractDict = new Dictionary<Vector2Int, AbstractNode>();
         for(int i = 0; i < entrances.Count; i++)
         {
@@ -174,7 +181,7 @@ public class HierarchicalMapFactory
             m_hierarchicalMap.AddAbstractNode(node);
     }
 
-    private static void CreateOrUpdateAbstractNode(ConcreteNode node, Cluster cluster, int level, Dictionary<Vector2Int, AbstractNode> abstractDict, ref int abstractId)
+    private void CreateOrUpdateAbstractNode(ConcreteNode node, Cluster cluster, int level, Dictionary<Vector2Int, AbstractNode> abstractDict, ref int abstractId)
     {
         AbstractNode abstractNode;
         if(abstractDict.TryGetValue(node.Pos, out abstractNode))
@@ -184,7 +191,9 @@ public class HierarchicalMapFactory
         else
         {
             cluster.AddEntrancePoint(abstractId, node);
-            abstractDict[node.Pos] = new AbstractNode(abstractId, level, cluster.Id, node.Pos);
+            abstractNode = HPADemo.Instance.CreateAbstractNode(level, node.Pos);
+            abstractNode.Init(abstractId, level, cluster.Id, node.Pos);
+            abstractDict[node.Pos] = abstractNode;
             abstractId++;
         }
     }
@@ -275,7 +284,8 @@ public class HierarchicalMapFactory
         var entrance = cluster.AddEntrancePoint(abstractId, m_concreteMap.Get(concretePos));
         cluster.AddIntraEdgesData(entrance);
         //把节点插入到图中
-        abstractNode = new AbstractNode(abstractId, 1, cluster.Id, concretePos);
+        abstractNode = HPADemo.Instance.CreateAbstractNode(1, concretePos);
+        abstractNode.Init(abstractId, 1, cluster.Id, concretePos);
         map.AddAbstractNode(abstractNode);
         map.AbstractGraph.AddNode(abstractNode);
         //把该节点相关的边插入到图中

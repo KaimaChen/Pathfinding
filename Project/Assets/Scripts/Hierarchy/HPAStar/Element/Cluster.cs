@@ -2,33 +2,39 @@
 using System.Collections.Generic;
 using System;
 
-public class Cluster
+public class Cluster : MonoBehaviour
 {
-    public int Id { get; }
+    [SerializeField] private int m_id;
 
     /// <summary>
     /// 在Cluster级别的位置
     /// </summary>
-    public Vector2Int Pos { get; }
+    [SerializeField] private Vector2Int m_pos;
 
     /// <summary>
     /// Cluster覆盖的grid范围
     /// </summary>
-    public RectInt Area { get; }
+    [SerializeField] private RectInt m_area;
 
-    private readonly ConcreteMap m_concreteMap;
+    private ConcreteMap m_concreteMap;
 
     private readonly Dictionary<Tuple<int, int>, float> m_distanceDict = new Dictionary<Tuple<int, int>, float>();
     private readonly Dictionary<Tuple<int, int>, List<INode>> m_pathDict = new Dictionary<Tuple<int, int>, List<INode>>();
 
     public List<EntrancePoint> EntrancePoints { get; } = new List<EntrancePoint>();
 
-    public Cluster(int id, Vector2Int pos, Vector2Int concretePos, Vector2Int size, ConcreteMap concreteMap)
+    public int Id { get { return m_id; } }
+    public Vector2Int Pos { get { return m_pos; } }
+    public RectInt Area { get { return m_area; } }
+
+    public void Init(int id, Vector2Int pos, Vector2Int concretePos, Vector2Int size, ConcreteMap concreteMap)
     {
-        Id = id;
-        Pos = pos;
+        m_id = id;
+        m_pos = pos;
         m_concreteMap = concreteMap;
-        Area = new RectInt(concretePos, size);
+        m_area = new RectInt(concretePos, size);
+        transform.localPosition = new Vector3(m_area.center.x, m_area.center.y, -0.1f);
+        transform.localScale = new Vector3(size.x, size.y, 1);
     }
 
     public bool IsContainsPoint(Vector2Int concretePos)
@@ -38,7 +44,7 @@ public class Cluster
 
     public EntrancePoint AddEntrancePoint(int abstractId, ConcreteNode node)
     {
-        var point = new EntrancePoint(abstractId, node);
+        EntrancePoint point = new EntrancePoint(abstractId, node);
         EntrancePoints.Add(point);
         return point;
     }

@@ -16,7 +16,7 @@ public class AbstractGraph
     public void AddNode(AbstractNode node)
     {
         int size = node.Id + 1;
-        if (Nodes.Count < size)
+        if (Nodes.Count >= size)
             Nodes[node.Id] = node;
         else
             Nodes.Add(node);

@@ -2,20 +2,31 @@
 
 public class ConcreteNode : MonoBehaviour, INode
 {
-    public int Id { get; private set; }
-    public int Cost { get; private set; }
-    public Vector2Int Pos
-    {
-        get { return new Vector2Int((int)transform.position.x, (int)transform.position.y); }
-        set { transform.position = new Vector3(value.x, value.y, 0); }
-    }
+    [SerializeField] private int m_id;
+    [SerializeField] private int m_cost;
+    [SerializeField] private Vector2Int m_pos;
 
+    public int Id { get { return m_id; } }
+    public int Cost { get { return m_cost; } }
+    public Vector2Int Pos { get { return m_pos; } }
     public bool IsObstacle { get { return Cost == Define.c_costObstacle; } }
 
     public void Init(int id, int x, int y, int cost = 1)
     {
-        Id = id;
-        Pos = new Vector2Int(x, y);
-        Cost = cost;
+        m_id = id;
+        SetCost(cost);
+        SetPos(x, y);
+    }
+
+    private void SetPos(int x, int y)
+    {
+        m_pos = new Vector2Int(x, y);
+        transform.position = new Vector3(x + 0.5f, y + 0.5f, 0);
+    }
+
+    private void SetCost(int cost)
+    {
+        m_cost = cost;
+        GetComponent<Renderer>().material.color = Define.Cost2Color(cost);
     }
 }

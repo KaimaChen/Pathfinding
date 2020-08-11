@@ -1,23 +1,30 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public class AbstractNode : INode
+public class AbstractNode : MonoBehaviour, INode
 {
-    public int Id { get; }
-    public int Level { get; set; }
+    [SerializeField] private int m_id;
+    [SerializeField] private int m_level;
+    [SerializeField] private int m_clusterId;
+    [SerializeField] private Vector2Int m_pos;
 
-    public int ClusterId { get; }
-
-    public Vector2Int Pos { get; }
+    public int Id { get { return m_id; } }
+    public int Level 
+    {
+        get { return m_level; }
+        set { m_level = value; }
+    }
+    public int ClusterId { get { return m_clusterId; } }
+    public Vector2Int Pos { get { return m_pos; } }
 
     public Dictionary<int, AbstractEdge> Edges { get; } = new Dictionary<int, AbstractEdge>();
 
-    public AbstractNode(int id, int level, int clusterId, Vector2Int concretePos)
+    public void Init(int id, int level, int clusterId, Vector2Int concretePos)
     {
-        Id = id;
-        Level = level;
-        ClusterId = clusterId;
-        Pos = concretePos;
+        m_id = id;
+        m_level = level;
+        m_clusterId = clusterId;
+        m_pos = concretePos;
     }
 
     public void AddEdge(AbstractEdge edge)
