@@ -11,7 +11,8 @@ public class HierarchicalMap : IMap
     public int MaxLevel { get; }
 
     private Cluster[] m_clusters;
-    private readonly Dictionary<Vector2Int, AbstractNode> m_concreteToAbstractNode = new Dictionary<Vector2Int, AbstractNode>();
+    private readonly Dictionary<int, AbstractNode> m_abstractNodeDict = new Dictionary<int, AbstractNode>();
+    private readonly Dictionary<Vector2Int, AbstractNode> m_pos2AbstractNode = new Dictionary<Vector2Int, AbstractNode>();
 
     private int m_curtLevel;
     private RectInt m_curtClusterArea;
@@ -39,7 +40,8 @@ public class HierarchicalMap : IMap
 
     public void AddAbstractNode(AbstractNode node)
     {
-        m_concreteToAbstractNode[node.Pos] = node;
+        m_abstractNodeDict[node.Id] = node;
+        m_pos2AbstractNode[node.Pos] = node;
         AbstractGraph.AddNode(node);
     }
 
@@ -54,13 +56,19 @@ public class HierarchicalMap : IMap
         AbstractGraph.RemoveEdgeFromAndToNode(abstractId);
         AbstractGraph.RemoveLastNode(abstractId);
 
-        m_concreteToAbstractNode.Remove(absNode.Pos);
+        m_abstractNodeDict.Remove(absNode.Id);
+        m_pos2AbstractNode.Remove(absNode.Pos);
+    }
+
+    public AbstractNode GetAbstractNode(int id)
+    {
+        m_abstractNodeDict.TryGetValue(id, out AbstractNode node);
+        return node;
     }
 
     public AbstractNode GetAbstractNode(Vector2Int concretePos)
     {
-        AbstractNode node;
-        m_concreteToAbstractNode.TryGetValue(concretePos, out node);
+        m_pos2AbstractNode.TryGetValue(concretePos, out AbstractNode node);
         return node;
     }
 
@@ -229,17 +237,22 @@ public class HierarchicalMap : IMap
     /// </summary>
     private void AddEdgesBetweenAbstractNodes(int absId1, int absId2, int level)
     {
+        var node1 = AbstractGraph.GetNode(absId1);
+        var node2 = AbstractGraph.GetNode(absId2);
+
         var planner = new PathPlanner(this, null);
-        var path = planner.Search(AbstractGraph.GetNode(absId1), AbstractGraph.GetNode(absId2));
+        var path = planner.Search(node1, node2);
         if(path != null && path.Nodes.Count > 0)
         {
-            AbstractEdge edge = new AbstractEdge(absId2, path.Cost, level, false);
+            AbstractEdge edge = HPADemo.Instance.CreateEdge(node1.Pos, node2.Pos, level, false);
+            edge.Init(absId2, path.Cost, level, false);
             edge.SetInnerLowerLevelPath(path.Nodes);
             AbstractGraph.AddEdge(absId1, edge);
 
             path.Nodes.Reverse();
 
-            edge = new AbstractEdge(absId1, path.Cost, level, false);
+            edge = HPADemo.Instance.CreateEdge(node2.Pos, node1.Pos, level, false);
+            edge.Init(absId1, path.Cost, level, false);
             edge.SetInnerLowerLevelPath(path.Nodes);
             AbstractGraph.AddEdge(absId2, edge);
         }

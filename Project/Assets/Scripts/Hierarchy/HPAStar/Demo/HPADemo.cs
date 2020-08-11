@@ -11,6 +11,7 @@ public class HPADemo : MonoBehaviour
     public GameObject m_concreteNodePrefab;
     public GameObject m_clusterPrefab;
     public GameObject m_abstractNodePrefab;
+    public GameObject m_edgePrefab;
 
     /// <summary>
     /// 横向多少格子
@@ -108,19 +109,48 @@ public class HPADemo : MonoBehaviour
         return cluster;
     }
 
-    public AbstractNode CreateAbstractNode(int level, Vector2Int pos)
+    private Transform GetContainer(int level, string name)
     {
-        Transform container = transform.Find(level.ToString());
-        if(container == null)
+        Transform levelContainer = transform.Find(level.ToString());
+        if(levelContainer == null)
         {
-            container = new GameObject(level.ToString()).transform;
-            container.SetParent(transform);
+            levelContainer = new GameObject(level.ToString()).transform;
+            levelContainer.SetParent(transform);
         }
 
+        Transform container = levelContainer.Find(name);
+        if(container == null)
+        {
+            container = new GameObject(name).transform;
+            container.SetParent(levelContainer);
+        }
+
+        return container;
+    }
+
+    public AbstractNode CreateAbstractNode(int level, Vector2Int pos)
+    {
+        Transform container = GetContainer(level, "NodeContainer");
         GameObject go = GameObject.Instantiate(m_abstractNodePrefab, container);
         go.transform.localPosition = new Vector3(pos.x + 0.5f, pos.y + 0.5f, -0.2f);
         go.GetComponent<Renderer>().material.color = new Color(0, 0, 1, 0.5f);
         return go.GetComponent<AbstractNode>();
+    }
+
+    public AbstractEdge CreateEdge(Vector2Int start, Vector2Int target, int level, bool isInter)
+    {
+        Transform container = GetContainer(level, "EdgeContainer");
+        GameObject go = GameObject.Instantiate(m_edgePrefab, container);
+        go.transform.localPosition = new Vector3(0, 0, -2);
+        go.GetComponent<Renderer>().material.color = isInter ? Color.black : Color.red;
+
+        LineRenderer line = go.GetComponent<LineRenderer>();
+        Vector3[] positions = new Vector3[2];
+        positions[0] = new Vector3(start.x + 0.5f, start.y + 0.5f, 0);
+        positions[1] = new Vector3(target.x + 0.5f, target.y + 0.5f, 0);
+        line.SetPositions(positions);
+
+        return go.GetComponent<AbstractEdge>();
     }
 
     private void ShowLevel(int level)

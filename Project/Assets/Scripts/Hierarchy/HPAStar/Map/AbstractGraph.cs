@@ -37,7 +37,10 @@ public class AbstractGraph
 
     public void AddEdge(int sourceId, int targetId, float cost, int level, bool isInterEdge)
     {
-        AbstractEdge edge = new AbstractEdge(targetId, cost, level, isInterEdge);
+        var sourceNode = GetNode(sourceId);
+        var targetNode = GetNode(targetId);
+        var edge = HPADemo.Instance.CreateEdge(sourceNode.Pos, targetNode.Pos, level, isInterEdge);
+        edge.Init(targetId, cost, level, isInterEdge);
         Nodes[sourceId].AddEdge(edge);
     }
 

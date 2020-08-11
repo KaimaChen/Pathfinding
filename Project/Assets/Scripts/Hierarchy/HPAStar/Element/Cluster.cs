@@ -92,8 +92,11 @@ public class Cluster : MonoBehaviour
         {
             m_distanceDict[tuple] = m_distanceDict[invTuple] = path.Cost;
 
+            m_pathDict[tuple] = new List<INode>();
             m_pathDict[tuple].AddRange(path.Nodes);
+
             path.Nodes.Reverse();
+            m_pathDict[invTuple] = new List<INode>();
             m_pathDict[invTuple].AddRange(path.Nodes);
         }
     }

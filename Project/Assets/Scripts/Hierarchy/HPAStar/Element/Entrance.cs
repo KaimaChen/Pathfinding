@@ -18,8 +18,6 @@ public class Entrance
 
     public Entrance(Cluster cluster1, Cluster cluster2, ConcreteNode node1, ConcreteNode node2, Orientation orientation)
     {
-        Debug.Log($"Create Entrance: {node1.Pos}, {node2.Pos}");
-
         Cluster1 = cluster1;
         Cluster2 = cluster2;
         Node1 = node1;

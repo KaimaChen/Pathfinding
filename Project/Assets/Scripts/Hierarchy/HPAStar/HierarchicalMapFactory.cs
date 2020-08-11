@@ -16,6 +16,7 @@ public class HierarchicalMapFactory
     private int m_clusterSize;
     private int m_maxLevel;
 
+    private readonly Dictionary<int, AbstractNode> m_abstractNodeDict = new Dictionary<int, AbstractNode>();
     private readonly Dictionary<int, NodeBackup> m_backupDict = new Dictionary<int, NodeBackup>();
 
     public HierarchicalMap CreateHierarchicalMap(ConcreteMap concreteMap, int clusterSize, int maxLevel)
@@ -31,7 +32,7 @@ public class HierarchicalMapFactory
         m_hierarchicalMap.InitClusters(clusters);
 
         CreateAbstractNodes(entrances);
-        //CreateEdges(clusters, entrances);
+        CreateEdges(clusters, entrances);
         
         return m_hierarchicalMap;
     }
@@ -165,6 +166,9 @@ public class HierarchicalMapFactory
     #endregion
 
     #region AbstractNode
+    /// <summary>
+    /// 根据Entrance构建Abstract节点
+    /// </summary>
     private void CreateAbstractNodes(List<Entrance> entrances)
     {
         int abstractId = 0;
@@ -186,7 +190,8 @@ public class HierarchicalMapFactory
         AbstractNode abstractNode;
         if(abstractDict.TryGetValue(node.Pos, out abstractNode))
         {
-            abstractNode.Level = level;
+            if(level > abstractNode.Level)
+                abstractNode.Level = level;
         }
         else
         {
@@ -294,10 +299,12 @@ public class HierarchicalMapFactory
             if(cluster.IsConnected(abstractId, otherEntrance.AbstractId))
             {
                 float distance = cluster.Distance(abstractId, otherEntrance.AbstractId);
-                AbstractEdge edge = new AbstractEdge(otherEntrance.AbstractId, distance, 1, false);
+                AbstractEdge edge = HPADemo.Instance.CreateEdge(concretePos, otherEntrance.ConcreteNode.Pos, 1, false);
+                edge.Init(otherEntrance.AbstractId, distance, 1, false);
                 map.AbstractGraph.AddEdge(abstractId, edge);
 
-                edge = new AbstractEdge(abstractId, distance, 1, false);
+                edge = HPADemo.Instance.CreateEdge(otherEntrance.ConcreteNode.Pos, concretePos, 1, false);
+                edge.Init(abstractId, distance, 1, false);
                 map.AbstractGraph.AddEdge(otherEntrance.AbstractId, edge);
             }
         }
@@ -321,14 +328,17 @@ public class HierarchicalMapFactory
         foreach (var edge in backup.Edges)
         {
             int targetNodeId = edge.TargetNodeId;
+            var targetNode = map.GetAbstractNode(targetNodeId);
 
-            AbstractEdge abstractEdge = new AbstractEdge(targetNodeId, edge.Cost, edge.Level, edge.IsInterEdge);
+            AbstractEdge abstractEdge = HPADemo.Instance.CreateEdge(node.Pos, targetNode.Pos, edge.Level, edge.IsInterEdge);
+            abstractEdge.Init(targetNodeId, edge.Cost, edge.Level, edge.IsInterEdge);
             abstractEdge.SetInnerLowerLevelPath(edge.InnerLowerLevelPath);
             graph.AddEdge(nodeId, abstractEdge);
 
             edge.InnerLowerLevelPath?.Reverse();
 
-            abstractEdge = new AbstractEdge(nodeId, edge.Cost, edge.Level, edge.IsInterEdge);
+            abstractEdge = HPADemo.Instance.CreateEdge(targetNode.Pos, node.Pos, edge.Level, edge.IsInterEdge);
+            abstractEdge.Init(nodeId, edge.Cost, edge.Level, edge.IsInterEdge);
             abstractEdge.SetInnerLowerLevelPath(edge.InnerLowerLevelPath);
             graph.AddEdge(targetNodeId, abstractEdge);
         }

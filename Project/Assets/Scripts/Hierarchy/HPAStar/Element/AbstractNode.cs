@@ -36,11 +36,18 @@ public class AbstractNode : MonoBehaviour, INode
 
     public void RemoveEdge(int targetNodeId)
     {
-        Edges.Remove(targetNodeId);
+        if(Edges.TryGetValue(targetNodeId, out AbstractEdge edge))
+        {
+            edge.Release();
+            Edges.Remove(targetNodeId);
+        }
     }
 
     public void ClearEdges()
     {
+        foreach (var edge in Edges.Values)
+            edge.Release();
+
         Edges.Clear();
     }
 }
