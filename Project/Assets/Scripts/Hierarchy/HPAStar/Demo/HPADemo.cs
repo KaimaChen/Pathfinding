@@ -115,7 +115,7 @@ public class HPADemo : MonoBehaviour
         if (node == null)
             return;
 
-        m_startNode.SetSearchType(SearchType.None);
+        m_startNode.SetSearchType(SearchType.None, false);
         m_startNode = node;
         m_startNode.SetSearchType(SearchType.Start);
     }
@@ -126,7 +126,7 @@ public class HPADemo : MonoBehaviour
         if (node == null)
             return;
 
-        m_goalNode.SetSearchType(SearchType.None);
+        m_goalNode.SetSearchType(SearchType.None, false);
         m_goalNode = node;
         m_goalNode.SetSearchType(SearchType.Goal);
     }
