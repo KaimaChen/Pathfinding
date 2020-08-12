@@ -3,7 +3,7 @@ Many pathfinding algorithm
 
 
 
-## 包含的算法
+## Contents
 
 * 【Basic】
   * A*
@@ -24,6 +24,8 @@ Many pathfinding algorithm
     * Generalized Adaptive A* (GAA*)
   	* Generalized Fringe-Retrieving A* (G-FRA*)
   	* Moving Target D* Lite (MT-D* Lite)
+* 【Hierarchical Search】
+  * HPA*
 * 【Other Search】
   * Flow Field
   * Jump Point Search
@@ -31,15 +33,26 @@ Many pathfinding algorithm
 
 
 
-## 怎么玩
+## How to play
 
-### 选择算法
+### Choose scene
 
-运行Pathfinding场景，选中Search这个物体，然后其Inspector面板中选择想要的寻路算法，按空格键来运行算法
+* [HPA] scene for HPA* algorithm, press space key to run the algorithm.
+* [Pathfinding] scene for other search algorithm, select GameObject [Search], choose algorithm in Inspector, press space key to run the algorithm.
+* [FlowField] scene for flowfield algorithm, you can see the result immediately without any operation.
 
-### 网格操作
+### Handle grid
 
-- 按住可以拖动起点和终点的位置
-- 鼠标左键添加阻挡
-- 鼠标右键移除阻挡
+- You can drag the start and goal node
+- Left click can add obstacle
+- Right click can remove obstacle
 
+
+
+## Reference
+
+[Github PathFinding.js](https://github.com/qiao/PathFinding.js)
+
+[Github HierarchicalPathfinder](https://github.com/Rydra/HierarchicalPathfinder)
+
+Many papers

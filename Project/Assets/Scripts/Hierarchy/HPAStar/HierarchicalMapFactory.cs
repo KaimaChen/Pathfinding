@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 public class HierarchicalMapFactory
@@ -16,7 +14,6 @@ public class HierarchicalMapFactory
     private int m_clusterSize;
     private int m_maxLevel;
 
-    private readonly Dictionary<int, AbstractNode> m_abstractNodeDict = new Dictionary<int, AbstractNode>();
     private readonly Dictionary<int, NodeBackup> m_backupDict = new Dictionary<int, NodeBackup>();
 
     public HierarchicalMap CreateHierarchicalMap(ConcreteMap concreteMap, int clusterSize, int maxLevel)
