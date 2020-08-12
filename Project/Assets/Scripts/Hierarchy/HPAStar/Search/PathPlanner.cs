@@ -61,6 +61,7 @@ public class PathPlanner
                     float g = curtNode.G + m_map.CalcHeuristic(curtNode.OriginNode, successor);
                     float h = m_map.CalcHeuristic(successor, m_goal);
                     node = new PlannerNode(successor, g, h, NodeStatus.Open);
+                    node.Parent = curtNode;
                     m_nodes[successor.Id] = node;
                     m_open.Enqueue(node, node.F);
                 }

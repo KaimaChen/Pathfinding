@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ConcreteMap : IMap
@@ -14,12 +15,19 @@ public class ConcreteMap : IMap
         m_nodes = new ConcreteNode[height, width];
     }
 
+    public void ForeachNode(Action<ConcreteNode> callback)
+    {
+        for (int y = 0; y < Height; y++)
+            for (int x = 0; x < Width; x++)
+                callback(m_nodes[y, x]);
+    }
+
     public void AddNode(int x, int y, ConcreteNode node)
     {
         m_nodes[y, x] = node;
     }
 
-    public ConcreteNode Get(int x, int y)
+    public ConcreteNode GetNode(int x, int y)
     {
         if (x < 0 || x >= Width || y < 0 || y >= Height)
             return null;
@@ -29,7 +37,7 @@ public class ConcreteMap : IMap
 
     public ConcreteNode Get(Vector2Int pos)
     {
-        return Get(pos.x, pos.y);
+        return GetNode(pos.x, pos.y);
     }
 
     public int NodeCount()
@@ -59,7 +67,7 @@ public class ConcreteMap : IMap
     {
         int x = curtPos.x + dx;
         int y = curtPos.y + dy;
-        ConcreteNode node = Get(x, y);
+        ConcreteNode node = GetNode(x, y);
         if(node != null && !node.IsObstacle)
         {
             result.Add(node);

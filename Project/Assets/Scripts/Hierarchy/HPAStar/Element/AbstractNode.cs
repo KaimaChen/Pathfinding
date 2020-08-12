@@ -29,9 +29,18 @@ public class AbstractNode : MonoBehaviour, INode
 
     public void AddEdge(AbstractEdge edge)
     {
-        AbstractEdge originEdge;
-        if (!Edges.TryGetValue(edge.TargetNodeId, out originEdge) || originEdge.Level < edge.Level)
+        if(Edges.TryGetValue(edge.TargetNodeId, out AbstractEdge originEdge))
+        {
+            if(originEdge.Level < edge.Level)
+            {
+                Edges[edge.TargetNodeId] = edge;
+                originEdge.Release();
+            }
+        }
+        else
+        {
             Edges[edge.TargetNodeId] = edge;
+        }
     }
 
     public void RemoveEdge(int targetNodeId)
@@ -41,6 +50,11 @@ public class AbstractNode : MonoBehaviour, INode
             edge.Release();
             Edges.Remove(targetNodeId);
         }
+    }
+
+    public bool IsContainsEdge(int targetId)
+    {
+        return Edges.ContainsKey(targetId);
     }
 
     public void ClearEdges()

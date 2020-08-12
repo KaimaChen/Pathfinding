@@ -3,21 +3,19 @@ using UnityEngine;
 
 public static class HierarchicalSearch
 {
-    public static List<PathNode> Search(HierarchicalMap map, int maxLevel, Vector2Int startPos, Vector2Int goalPos, int maxRefineCount = int.MaxValue)
+    public static List<PathNode> Search(HierarchicalMapFactory factory, HierarchicalMap map, int maxLevel, Vector2Int startPos, Vector2Int goalPos, int maxRefineCount = int.MaxValue)
     {
-        var factory = new HierarchicalMapFactory();
-
         //首先插入起点和终点到图中
         var startAbsId = factory.InsertAbstractNode(map, startPos);
         var goalAbsId = factory.InsertAbstractNode(map, goalPos);
 
         var path =  SearchImpl(map, startAbsId, goalAbsId, maxLevel, maxRefineCount);
 
-        //TODO 路径平滑
+        //可以在这里应用路径平滑
 
         //搜索完毕后就移除起点和终点（如果常用，也可以留着）
-        factory.RemoveAbstractNode(map, startAbsId);
         factory.RemoveAbstractNode(map, goalAbsId);
+        factory.RemoveAbstractNode(map, startAbsId);
 
         return path;
     }

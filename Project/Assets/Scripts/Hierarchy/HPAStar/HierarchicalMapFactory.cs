@@ -90,8 +90,8 @@ public class HierarchicalMapFactory
             int maxY = btPos.y + cluster.Area.height;
             for(int y = minY; y < maxY; y++)
             {
-                prevNodes.Add(m_concreteMap.Get(leftX, y));
-                curtNodes.Add(m_concreteMap.Get(rightX, y));
+                prevNodes.Add(m_concreteMap.GetNode(leftX, y));
+                curtNodes.Add(m_concreteMap.GetNode(rightX, y));
             }
 
             CreateEntranceImpl(prevNodes, curtNodes, leftCluster, cluster, Orientation.Horizontal, result);
@@ -109,8 +109,8 @@ public class HierarchicalMapFactory
             int aboveY = btPos.y;
             for(int x = minX; x < maxX; x++)
             {
-                prevNodes.Add(m_concreteMap.Get(x, underY));
-                curtNodes.Add(m_concreteMap.Get(x, aboveY));
+                prevNodes.Add(m_concreteMap.GetNode(x, underY));
+                curtNodes.Add(m_concreteMap.GetNode(x, aboveY));
             }
 
             CreateEntranceImpl(prevNodes, curtNodes, underCluster, cluster, Orientation.Vertical, result);
@@ -148,11 +148,11 @@ public class HierarchicalMapFactory
                     //取中间
                     int centerX = (prevBegin.Pos.x + prev.Pos.x) / 2;
                     int centerY = (prevBegin.Pos.y + prev.Pos.y) / 2;
-                    ConcreteNode prevCenter = m_concreteMap.Get(centerX, centerY);
+                    ConcreteNode prevCenter = m_concreteMap.GetNode(centerX, centerY);
 
                     centerX = (curtBegin.Pos.x + curt.Pos.x) / 2;
                     centerY = (curtBegin.Pos.y + curt.Pos.y) / 2;
-                    ConcreteNode curtCenter = m_concreteMap.Get(centerX, centerY);
+                    ConcreteNode curtCenter = m_concreteMap.GetNode(centerX, centerY);
 
                     result.Add(new Entrance(prevCluster, curtCluster, prevCenter, curtCenter, orientation));
                 }

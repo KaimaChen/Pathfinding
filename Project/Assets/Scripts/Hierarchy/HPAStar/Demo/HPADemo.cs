@@ -36,6 +36,11 @@ public class HPADemo : MonoBehaviour
     private Transform m_concreteNodeContainer;
     private Transform m_clusterContainer;
 
+    private ConcreteNode m_startNode;
+    private ConcreteNode m_goalNode;
+    private bool m_dragStartNode;
+    private bool m_dragGoalNode;
+
     private void Awake()
     {
         Instance = this;
@@ -64,41 +69,131 @@ public class HPADemo : MonoBehaviour
                 m_concreteMap.AddNode(x, y, node);
             }
         }
+
+        m_startNode = m_concreteMap.GetNode(0, m_height / 2);
+        m_startNode.SetSearchType(SearchType.Start);
+        m_goalNode = m_concreteMap.GetNode(m_width - 1, m_height / 2);
+        m_goalNode.SetSearchType(SearchType.Goal);
     }
 
     void Update()
     {
-        if(Input.GetKeyDown(KeyCode.Space))
+        if (Input.GetMouseButtonDown(0))
+        {
+            ConcreteNode node = GetMouseOverNode();
+            if (node == m_startNode)
+                m_dragStartNode = true;
+            else if (node == m_goalNode)
+                m_dragGoalNode = true;
+        }
+        else if (Input.GetMouseButtonUp(0))
+        {
+            m_dragStartNode = m_dragGoalNode = false;
+        }
+        else if (Input.GetMouseButton(0))
+        {
+            if (m_dragStartNode)
+                DragStartNode();
+            else if (m_dragGoalNode)
+                DragGoalNode();
+            else
+                AddObstacle();
+        }
+        else if (Input.GetMouseButton(1))
+        {
+            RemoveObstacle();
+        }
+        else if (Input.GetKeyDown(KeyCode.Space))
         {
             Reset();
-
-            HierarchicalMapFactory factory = new HierarchicalMapFactory();
-            HierarchicalMap hierarchicalMap = factory.CreateHierarchicalMap(m_concreteMap, m_clusterSize, m_maxLevel);
+            Generate();
         }
+    }
+
+    private void DragStartNode()
+    {
+        ConcreteNode node = GetMouseOverNode();
+        if (node == null)
+            return;
+
+        m_startNode.SetSearchType(SearchType.None);
+        m_startNode = node;
+        m_startNode.SetSearchType(SearchType.Start);
+    }
+
+    private void DragGoalNode()
+    {
+        ConcreteNode node = GetMouseOverNode();
+        if (node == null)
+            return;
+
+        m_goalNode.SetSearchType(SearchType.None);
+        m_goalNode = node;
+        m_goalNode.SetSearchType(SearchType.Goal);
+    }
+
+    private void AddObstacle()
+    {
+        ConcreteNode node = GetMouseOverNode();
+        if (node != null && node != m_startNode && node != m_goalNode)
+            node.SetCost(Define.c_costObstacle);
+    }
+
+    private void RemoveObstacle()
+    {
+        ConcreteNode node = GetMouseOverNode();
+        if (node != null && node != m_startNode && node != m_goalNode)
+            node.SetCost(Define.c_costRoad);
+    }
+
+    private ConcreteNode GetMouseOverNode()
+    {
+        ConcreteNode result = null;
+
+        Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition);
+        if (Physics.Raycast(ray, out RaycastHit hit))
+            result = hit.collider.GetComponent<ConcreteNode>();
+
+        return result;
     }
 
     private void Reset()
     {
+        m_concreteMap.ForeachNode((node) =>
+        {
+            if (node.SearchType == SearchType.Path)
+                node.SetSearchType(SearchType.None);
+        });
+
         List<string> options = new List<string>();
-        for (int i = 1; i <= m_maxLevel; i++)
+        for (int i = 0; i <= m_maxLevel; i++)
             options.Add(i.ToString());
         options.Add("All");
         m_levelChooser.ClearOptions();
         m_levelChooser.AddOptions(options);
+        m_levelChooser.value = options.Count - 1;
 
-        for(int level = 1; level <= m_maxLevel; level++)
+        for(int i = transform.childCount - 1; i >= 0 ; i--)
         {
-            Transform container = transform.Find(level.ToString());
-            if (container == null)
-            {
-                container = new GameObject(level.ToString()).transform;
-                container.SetParent(transform);
-            }
-            container.gameObject.SetActive(level == m_levelChooser.value+1);
+            var child = transform.GetChild(i);
+            if (child != m_clusterContainer && child != m_concreteNodeContainer)
+                DestroyImmediate(child.gameObject);
         }
 
         for (int i = m_clusterContainer.childCount - 1; i >= 0 ; i--)
             Destroy(m_clusterContainer.GetChild(i).gameObject);
+    }
+
+    private void Generate()
+    {
+        HierarchicalMapFactory factory = new HierarchicalMapFactory();
+        HierarchicalMap hierarchicalMap = factory.CreateHierarchicalMap(m_concreteMap, m_clusterSize, m_maxLevel);
+        List<PathNode> path = HierarchicalSearch.Search(factory, hierarchicalMap, m_maxLevel, m_startNode.Pos, m_goalNode.Pos);
+        for(int i = 0; i < path.Count; i++)
+        {
+            var node = m_concreteMap.Get(path[i].Pos);
+            node.SetSearchType(SearchType.Path);
+        }
     }
 
     public Cluster CreateCluster(Vector2Int pos)
@@ -132,6 +227,7 @@ public class HPADemo : MonoBehaviour
     {
         Transform container = GetContainer(level, "NodeContainer");
         GameObject go = GameObject.Instantiate(m_abstractNodePrefab, container);
+        go.name = $"Node{level}:({pos.x},{pos.y})";
         go.transform.localPosition = new Vector3(pos.x + 0.5f, pos.y + 0.5f, -0.2f);
         go.GetComponent<Renderer>().material.color = new Color(0, 0, 1, 0.5f);
         return go.GetComponent<AbstractNode>();
@@ -141,6 +237,7 @@ public class HPADemo : MonoBehaviour
     {
         Transform container = GetContainer(level, "EdgeContainer");
         GameObject go = GameObject.Instantiate(m_edgePrefab, container);
+        go.name = $"Edge{level}:({start.x},{start.y})->({target.x},{target.y})";
         go.transform.localPosition = new Vector3(0, 0, -2);
         go.GetComponent<Renderer>().material.color = isInter ? Color.black : Color.red;
 

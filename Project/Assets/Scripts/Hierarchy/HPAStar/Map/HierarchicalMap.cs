@@ -222,7 +222,12 @@ public class HierarchicalMap : IMap
                 {
                     foreach (var entrance2 in entrancesInClusterGroup)
                     {
-                        if (entrance1 == entrance2 || !IsValidAbstractNodeForLevel(entrance1.AbstractId, level) || !IsValidAbstractNodeForLevel(entrance2.AbstractId, level))
+                        int absId1 = entrance1.AbstractId;
+                        int absId2 = entrance2.AbstractId;
+                        if (entrance1 == entrance2 || 
+                            !IsValidAbstractNodeForLevel(absId1, level) || 
+                            !IsValidAbstractNodeForLevel(absId2, level) ||
+                            AbstractGraph.IsContainsEdge(absId1, absId2))
                             continue;
 
                         AddEdgesBetweenAbstractNodes(entrance1.AbstractId, entrance2.AbstractId, level);

@@ -27,7 +27,7 @@ public class AbstractGraph
         //TODO：因为以index作为id，因此只能移除最后一个，想想其它快速的数据组织方式
         if (abstractId != Nodes.Count - 1)
         {
-            Debug.LogError("移除的不是最后一个，有地方出问题了");
+            Debug.LogError($"移除的不是最后一个({abstractId}, {Nodes.Count-1})，有地方出问题了");
             return false;
         }
 
@@ -47,6 +47,11 @@ public class AbstractGraph
     public void AddEdge(int srcId, AbstractEdge edge)
     {
         Nodes[srcId].AddEdge(edge);
+    }
+
+    public bool IsContainsEdge(int srcId, int targetId)
+    {
+        return Nodes[srcId].IsContainsEdge(targetId);
     }
 
     /// <summary>
