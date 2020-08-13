@@ -52,12 +52,12 @@ public class FlowField : BaseGrid<FlowFieldNode>
 			}
 			else
 			{
-				AddObstacle();
+				Brush(Define.c_costObstacle);
 			}
 		}
 		else if(Input.GetMouseButton(1))
 		{
-			RemoveObstacle();
+			Brush(Define.c_costGround);
 		}
 		else if(Input.GetKeyDown(KeyCode.Space))
 		{
@@ -74,27 +74,18 @@ public class FlowField : BaseGrid<FlowFieldNode>
 			return null;
 	}
 
-	protected override bool AddObstacle()
+	protected override bool Brush(int brushType)
 	{
 		bool result = false;
 
 		BaseNode node = GetMouseOverNode();
 		if (node != null && node != m_targetNode)
 		{
-			byte last = node.Cost;
-			node.SetCost(Define.c_costObstacle);
+			int last = node.Cost;
+			node.SetCost(brushType);
 			result = last != node.Cost;
 		}
 
-		if (result)
-			Generate();
-
-		return result;
-	}
-
-	protected override bool RemoveObstacle()
-	{
-		bool result = base.RemoveObstacle();
 		if (result)
 			Generate();
 

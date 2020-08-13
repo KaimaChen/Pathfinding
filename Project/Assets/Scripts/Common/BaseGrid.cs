@@ -16,6 +16,8 @@ public abstract class BaseGrid<T> : MonoBehaviour where T : BaseNode
 
     protected T[,] m_nodes;
 
+    protected int m_brushType = Define.c_costObstacle;
+
     protected virtual void Awake()
     {
         m_nodes = new T[m_row, m_col];
@@ -29,7 +31,7 @@ public abstract class BaseGrid<T> : MonoBehaviour where T : BaseNode
                 go.transform.localPosition = new Vector3(x, y, 0);
 
                 m_nodes[y, x] = go.GetComponent<T>();
-                m_nodes[y, x].Init(x, y, Define.c_costRoad);
+                m_nodes[y, x].Init(x, y, Define.c_costGround);
             }
         }
     }
@@ -37,35 +39,22 @@ public abstract class BaseGrid<T> : MonoBehaviour where T : BaseNode
     protected virtual void Update()
     {
         if (Input.GetMouseButton(0))
-            AddObstacle();
+            Brush(m_brushType);
         else if (Input.GetMouseButton(1))
-            RemoveObstacle();
+            Brush(Define.c_costGround);
         else if (Input.GetKeyDown(KeyCode.Space))
             Generate();
     }
 
     protected abstract void Generate();
 
-    protected virtual bool AddObstacle()
+    protected virtual bool Brush(int brushType)
     {
         BaseNode node = GetMouseOverNode();
         if(node != null)
         {
-            byte last = node.Cost;
-            node.SetCost(Define.c_costObstacle);
-            return last != node.Cost;
-        }
-
-        return false;
-    }
-
-    protected virtual bool RemoveObstacle()
-    {
-        BaseNode node = GetMouseOverNode();
-        if(node != null)
-        {
-            byte last = node.Cost;
-            node.SetCost(Define.c_costRoad);
+            int last = node.Cost;
+            node.SetCost(brushType);
             return last != node.Cost;
         }
 

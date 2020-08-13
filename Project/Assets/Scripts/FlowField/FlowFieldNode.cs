@@ -36,7 +36,7 @@ public class FlowFieldNode : BaseNode
 	}
     #endregion
 
-    public override void Init(int x, int y, byte cost)
+    public override void Init(int x, int y, int cost)
 	{
 		base.Init(x, y, cost);
 
@@ -116,7 +116,7 @@ public class FlowFieldNode : BaseNode
 		}
 	}
 
-	private Color GetColor(byte cost)
+	private Color GetColor(int cost)
 	{
 		if (m_isTarget)
 			return Color.red;

@@ -172,7 +172,7 @@ public class FocussedDStar : BaseDStar
         return MinVal();
     }
 
-    private Vector2? ModifyCost(SearchNode X, byte cost)
+    private Vector2? ModifyCost(SearchNode X, int cost)
     {
         X.SetCost(cost);
 

@@ -131,7 +131,7 @@ public class DStar : BaseDStar
             m_openQueue.Enqueue(X, X.Key);
     }
 
-    private float ModifyCost(SearchNode node, byte cost)
+    private float ModifyCost(SearchNode node, int cost)
     {
         node.SetCost(cost);
 

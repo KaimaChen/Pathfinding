@@ -2,7 +2,8 @@
 
 public static class Define
 {
-	public const int c_costRoad = 1;
+	public const int c_costGround = 1;
+	public const int c_costWater = 2;
 	public const int c_costObstacle = 255;
 	public static readonly float c_sqrt2 = Mathf.Sqrt(2);
 
@@ -13,9 +14,9 @@ public static class Define
 			case 1:
 				return Color.white;
 			case 2:
-				return Color.green;
-			case 3:
 				return Color.blue;
+			case 3:
+				return Color.green;
 			case c_costObstacle:
 				return Color.black;
 			default:
@@ -81,6 +82,7 @@ public enum SearchAlgo
 	JPS,
 	JPSPlus,
 	BiA_Star,
+	AnnotatedA_Star,
 	//Incremental
 	D_Star,
 	FocussedD_Star,
@@ -93,6 +95,4 @@ public enum SearchAlgo
 	GAA_Star,
 	GFRA_Star,
 	MT_DstarLite,
-	//Hierarchy
-	AnnotatedA_Star,
 }

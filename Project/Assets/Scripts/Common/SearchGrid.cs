@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.UI;
 using System.Collections.Generic;
 
 /// <summary>
@@ -9,6 +10,7 @@ public class SearchGrid : BaseGrid<SearchNode>
 {
     private static SearchGrid m_instance;
 
+    public Dropdown m_brushTypeDropDown;
     public SearchAlgo m_searchAlgo;
     public HeuristicType m_heuristicType;
     public int m_unitSize = 1;
@@ -45,6 +47,12 @@ public class SearchGrid : BaseGrid<SearchNode>
         m_startNode.SetSearchType(SearchType.Start, false);
         m_goalNode = GetNode(m_col - 1, m_row / 2);
         m_goalNode.SetSearchType(SearchType.Goal, false);
+
+        List<string> options = new List<string>() { "Obstacle", "Ground", "Water" };
+        m_brushTypeDropDown.ClearOptions();
+        m_brushTypeDropDown.AddOptions(options);
+        m_brushTypeDropDown.onValueChanged.AddListener(OnChangeBrushType);
+        m_brushType = Define.c_costObstacle;
     }
 
     protected override void Update()
@@ -68,11 +76,11 @@ public class SearchGrid : BaseGrid<SearchNode>
             else if (m_dragGoalNode)
                 DragGoalNode();
             else
-                AddObstacle();
+                Brush(m_brushType);
         }
         else if(Input.GetMouseButton(1))
         {
-            RemoveObstacle();
+            Brush(Define.c_costGround);
         }
         else if(Input.GetKeyDown(KeyCode.Space))
         {
@@ -92,36 +100,21 @@ public class SearchGrid : BaseGrid<SearchNode>
             StartCoroutine(m_algo.Process());
     }
 
-    protected override bool AddObstacle()
+    protected override bool Brush(int brushType)
     {
         SearchNode node = GetMouseOverNode();
         if (node != null && node != m_startNode && node != m_goalNode)
         {
-            if(node.Cost != Define.c_costObstacle)
+            int oldCost = node.Cost;
+            if(node.Cost != brushType)
             {
-                node.SetCost(Define.c_costObstacle);
+                node.SetCost(brushType);
 
                 if (m_algo != null)
-                    m_algo.NotifyChangeNode(new List<SearchNode>() { node }, true);
-
-                return true;
-            }
-        }
-
-        return false;
-    }
-
-    protected override bool RemoveObstacle()
-    {
-        SearchNode node = GetMouseOverNode();
-        if(node != null && node != m_startNode && node != m_goalNode)
-        {
-            if(node.Cost != Define.c_costRoad)
-            {
-                node.SetCost(Define.c_costRoad);
-
-                if(m_algo != null)
-                    m_algo.NotifyChangeNode(new List<SearchNode>() { node }, false);
+                {
+                    bool isIncreaseCost = brushType > oldCost;
+                    m_algo.NotifyChangeNode(new List<SearchNode>() { node }, isIncreaseCost);
+                }
 
                 return true;
             }
@@ -279,4 +272,11 @@ public class SearchGrid : BaseGrid<SearchNode>
                 return 0;
         }
     }
+
+    #region 事件
+    private void OnChangeBrushType(int index)
+    {
+        m_brushType = (index == 0 ? Define.c_costObstacle : index);
+    }
+    #endregion
 }

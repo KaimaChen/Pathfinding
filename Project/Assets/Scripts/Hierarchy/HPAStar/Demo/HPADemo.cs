@@ -142,7 +142,7 @@ public class HPADemo : MonoBehaviour
     {
         ConcreteNode node = GetMouseOverNode();
         if (node != null && node != m_startNode && node != m_goalNode)
-            node.SetCost(Define.c_costRoad);
+            node.SetCost(Define.c_costGround);
     }
 
     private ConcreteNode GetMouseOverNode()

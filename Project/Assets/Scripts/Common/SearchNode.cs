@@ -101,7 +101,7 @@ public class SearchNode : BaseNode
         }
     }
 
-    public override void Init(int x, int y, byte cost)
+    public override void Init(int x, int y, int cost)
     {
         base.Init(x, y, cost);
 
@@ -129,7 +129,7 @@ public class SearchNode : BaseNode
         m_valueText.gameObject.SetActive(false);
     }
 
-    public override void SetCost(byte cost)
+    public override void SetCost(int cost)
     {
         base.SetCost(cost);
         m_mat.color = Define.Cost2Color(cost);

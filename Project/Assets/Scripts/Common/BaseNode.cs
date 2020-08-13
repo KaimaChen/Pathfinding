@@ -4,7 +4,7 @@ public class BaseNode : MonoBehaviour
 {
     protected int m_x;
     protected int m_y;
-    protected byte m_cost;
+    protected int m_cost;
 
     #region get_set
     public int X { get { return m_x; } }
@@ -13,7 +13,7 @@ public class BaseNode : MonoBehaviour
 
     public Vector2Int Pos { get { return new Vector2Int(m_x, m_y); } }
 
-    public byte Cost { get { return m_cost; } }
+    public int Cost { get { return m_cost; } }
     #endregion
 
     protected virtual void Awake()
@@ -22,7 +22,7 @@ public class BaseNode : MonoBehaviour
             Debug.LogError("请在Node的预设上绑定Collider");
     }
 
-    public virtual void Init(int x, int y, byte cost)
+    public virtual void Init(int x, int y, int cost)
     {
         m_x = x;
         m_y = y;
@@ -34,7 +34,7 @@ public class BaseNode : MonoBehaviour
         return m_cost == Define.c_costObstacle;
     }
 
-    public virtual void SetCost(byte cost)
+    public virtual void SetCost(int cost)
     {
         m_cost = cost;
     }
