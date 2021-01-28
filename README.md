@@ -60,5 +60,3 @@ Many pathfinding algorithm
 [Github PathFinding.js](https://github.com/qiao/PathFinding.js)
 
 [Github HierarchicalPathfinder](https://github.com/Rydra/HierarchicalPathfinder)
-
-Many papers
