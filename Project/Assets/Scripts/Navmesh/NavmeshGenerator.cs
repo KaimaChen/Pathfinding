@@ -7,7 +7,6 @@ namespace Pathfinding.Navmesh
 {
 	/// <summary>
 	/// 简单的Navmesh生成器玩具，真正应用还得是业界标准RecastNavgation
-	/// 参考：https://www.gamedev.net/tutorials/_/technical/artificial-intelligence/generating-2d-navmeshes-r3393/
 	/// </summary>
 	public class NavmeshGenerator
 	{

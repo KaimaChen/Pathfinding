@@ -5,6 +5,12 @@ Many pathfinding algorithm
 
 ## Contents
 
+* 【Data Structure】
+  * Grid
+  * Navmesh
+
+
+
 * 【Basic】
   * A*
   * BFS
