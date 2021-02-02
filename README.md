@@ -8,6 +8,7 @@ Many pathfinding algorithm
 * 【Data Structure】
   * Grid
   * Navmesh
+  * Visibility Graph
 
 
 
