@@ -229,7 +229,7 @@ public static class GraphicsTool {
         GL.PopMatrix();
     }
 
-    public static void DrawPolygon(List<Vector2> points, Material mat, bool wrap = true, bool isFill = false)
+    public static void DrawPolygon(Vector2[] points, Material mat, bool wrap = true, bool isFill = false)
     {
         mat.SetPass(0);
 
@@ -239,17 +239,17 @@ public static class GraphicsTool {
         if (isFill)
         {
             GL.Begin(GL.TRIANGLES);
-            for (int i = 2; i < points.Count; i++)
+            for (int i = 2; i < points.Length; i++)
             {
-                
+
                 GL.Vertex(points[i - 2]);
                 GL.Vertex(points[i - 1]);
                 GL.Vertex(points[i]);
             }
             if (wrap)
             {
-                GL.Vertex(points[points.Count - 2]);
-                GL.Vertex(points[points.Count - 1]);
+                GL.Vertex(points[points.Length - 2]);
+                GL.Vertex(points[points.Length - 1]);
                 GL.Vertex(points[0]);
             }
             GL.End();
@@ -258,7 +258,7 @@ public static class GraphicsTool {
         {
             GL.Begin(GL.LINES);
 
-            for (int i = 1; i < points.Count; i++)
+            for (int i = 1; i < points.Length; i++)
             {
                 GL.Vertex(points[i - 1]);
                 GL.Vertex(points[i]);
@@ -266,13 +266,18 @@ public static class GraphicsTool {
 
             if (wrap)
             {
-                GL.Vertex(points[points.Count - 1]);
+                GL.Vertex(points[points.Length - 1]);
                 GL.Vertex(points[0]);
             }
 
             GL.End();
         }
-        
+
         GL.PopMatrix();
+    }
+
+    public static void DrawPolygon(List<Vector2> points, Material mat, bool wrap = true, bool isFill = false)
+    {
+        DrawPolygon(points.ToArray(), mat, wrap, isFill);
     }
 }
