@@ -10,12 +10,54 @@ namespace Pathfinding.Navmesh
 	/// </summary>
 	public class NavmeshGenerator
 	{
-		public static List<DelaunayTriangle> Generate(List<List<IntPoint>> walkablePolygons, List<List<IntPoint>> blockedPolygons)
+		public static List<GraphNode> Generate(List<List<IntPoint>> walkablePolygons, List<List<IntPoint>> blockedPolygons,  out List<DelaunayTriangle> triangles)
 		{
 			var polygons = ClipPolygons(walkablePolygons, blockedPolygons);
-			var triangles = GenerateTriangles(polygons);
+			triangles = GenerateTriangles(polygons);
 
-			return triangles;
+			return TrianglesToNodes(triangles);
+		}
+
+		/// <summary>
+		/// 将三角形转为图搜索节点
+		/// </summary>
+		private static List<GraphNode> TrianglesToNodes(List<DelaunayTriangle> triangles)
+		{
+			List<GraphNode> result = new List<GraphNode>();
+
+			var dict = new Dictionary<DelaunayTriangle, GraphNode>();
+			for (int i = 0; i < triangles.Count; i++)
+			{
+				var centroid = triangles[i].Centroid();
+				var center = new Vector2(centroid.Xf, centroid.Yf);
+				var node = new GraphNode(center);
+				dict[triangles[i]] = node;
+				result.Add(node);
+			}
+
+			for (int i = 0; i < triangles.Count; i++)
+			{
+				var t = triangles[i];
+				var node = result[i];
+
+				if (t.Neighbors._0 != null)
+				{
+					if (dict.TryGetValue(t.Neighbors._0, out GraphNode n))
+						node.AddNeighbor(n);
+				}
+				if (t.Neighbors._1 != null)
+				{
+					if (dict.TryGetValue(t.Neighbors._1, out GraphNode n))
+						node.AddNeighbor(n);
+				}
+				if (t.Neighbors._2 != null)
+				{
+					if (dict.TryGetValue(t.Neighbors._2, out GraphNode n))
+						node.AddNeighbor(n);
+				}
+			}
+
+			return result;
 		}
 
 		/// <summary>

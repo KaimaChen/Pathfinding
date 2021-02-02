@@ -56,9 +56,12 @@ public class NavmeshDemo : MonoBehaviour
 			},
 		};
 
-		var triangles = NavmeshGenerator.Generate(walkablePolygons, blockedPolygons);
+		List<DelaunayTriangle> triangles;
+		var nodes = NavmeshGenerator.Generate(walkablePolygons, blockedPolygons, out triangles);
 
+		//设置起点和终点
 		DelaunayTriangle start = null, end = null;
+		GraphNode startNode = null, endNode = null;
 		float minX = float.MaxValue, maxX = 0;
 		for(int i = 0;  i < triangles.Count; i++)
         {
@@ -68,11 +71,13 @@ public class NavmeshDemo : MonoBehaviour
             {
 				minX = centroid.Xf;
 				start = t;
+				startNode = nodes[i];
             }
 			if(centroid.Xf > maxX)
             {
 				maxX = centroid.Xf;
 				end = t;
+				endNode = nodes[i];
             }
 
 			//鼠标所在三角形为终点
@@ -80,10 +85,11 @@ public class NavmeshDemo : MonoBehaviour
             {
 				maxX = float.MaxValue;
 				end = t;
+				endNode = nodes[i];
             }
         }
 
-		NavmeshAStar algo = new NavmeshAStar(triangles, start, end);
+		GraphAStar algo = new GraphAStar(startNode, endNode);
 		algo.Process();
 
 		m_mat.SetColor("_Color", Color.black);
@@ -99,7 +105,7 @@ public class NavmeshDemo : MonoBehaviour
 		DrawTriangle(end, false);
 
 		List<Vector2> path = new List<Vector2>();
-		var node = NavmeshAStar.EndNode;
+		var node = endNode;
 		while (node != null)
         {
 			path.Add(node.Center);

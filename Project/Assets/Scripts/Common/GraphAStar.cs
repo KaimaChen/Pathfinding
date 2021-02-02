@@ -1,29 +1,28 @@
 ﻿using Priority_Queue;
-using UnityEngine;
 
 public class GraphAStar
 {
-    public static GraphNode StartNode;
-    public static GraphNode EndNode;
+    private readonly GraphNode m_startNode;
+    private readonly GraphNode m_endNode;
 
     private readonly SimplePriorityQueue<GraphNode> m_open = new SimplePriorityQueue<GraphNode>();
 
     public GraphAStar(GraphNode startNode, GraphNode endNode)
     {
-        StartNode = startNode;
-        EndNode = endNode;
+        m_startNode = startNode;
+        m_endNode = endNode;
     }
 
     public void Process()
     {
-        StartNode.G = 0;
-        AddToOpen(StartNode);
+        m_startNode.G = 0;
+        AddToOpen(m_startNode);
 
         while (OpenSize() > 0)
         {
             var node = PopOpen();
 
-            if (node == EndNode)
+            if (node == m_endNode)
                 break;
 
             node.Closed = true;
@@ -52,7 +51,7 @@ public class GraphAStar
             if (!nextNode.Opened)
                 AddToOpen(nextNode);
             else
-                m_open.UpdatePriority(nextNode, nextNode.F(EndNode));
+                m_open.UpdatePriority(nextNode, nextNode.F(m_endNode));
         }
     }
 
@@ -66,7 +65,7 @@ public class GraphAStar
     #region Open
     private void AddToOpen(GraphNode node)
     {
-        m_open.Enqueue(node, node.F(EndNode));
+        m_open.Enqueue(node, node.F(m_endNode));
         node.Opened = true;
     }
 
