@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections.Generic;
 
-public static class GraphicsTool {
+public static class GraphicsTool 
+{
     //创建正交投影矩阵
     public static void CreateOrthogonalProjectMatrix(ref Matrix4x4 projectMatrix, Vector3 maxInViewSpace, Vector3 minInViewSpace)
     {
@@ -165,11 +166,11 @@ public static class GraphicsTool {
         GL.Begin(GL.LINES);
 
         Vector2? last = null, first = null;
-        float rad = 2 * Mathf.PI / pointCount;
+        float delta = 2 * Mathf.PI / pointCount;
         for(int i = 0; i < pointCount; i++)
         {
-            float x = center.x + Mathf.Cos(rad * i) * radius;
-            float y = center.y + Mathf.Sin(rad * i) * radius;
+            float x = center.x + Mathf.Cos(delta * i) * radius;
+            float y = center.y + Mathf.Sin(delta * i) * radius;
 
             if (last.HasValue)
             {
@@ -193,6 +194,54 @@ public static class GraphicsTool {
         GL.End();
 
         GL.PopMatrix();
+    }
+
+    public static void DrawArc(Vector2 center, float radius, float startRadian, float endRadian, Material mat, int pointCount = 40)
+    {
+        mat.SetPass(0);
+
+        GL.PushMatrix();
+        GL.LoadPixelMatrix();
+
+        GL.Begin(GL.LINES);
+
+        ClampAngle(startRadian);
+        ClampAngle(endRadian);
+        if (startRadian > endRadian)
+        {
+            float temp = startRadian;
+            startRadian = endRadian;
+            endRadian = temp;
+        }
+        
+        Vector2? last = null;
+        float duration = endRadian - startRadian;
+        float delta = duration / pointCount;
+        for (int i = 0; i <= pointCount; i++)
+        {
+            float angle = startRadian + delta * i;
+            float x = center.x + Mathf.Cos(angle) * radius;
+            float y = center.y + Mathf.Sin(angle) * radius;
+
+            if (last.HasValue)
+            {
+                GL.Vertex(last.Value);
+                GL.Vertex3(x, y, 0);
+            }
+            last = new Vector2(x, y);
+        }
+
+        GL.End();
+
+        GL.PopMatrix();
+    }
+
+    private static float ClampAngle(float radian)
+    {
+        float max = 2 * Mathf.PI;
+        while (radian < 0) radian += max;
+        while (radian > max) radian -= max;
+        return radian;
     }
 
     public static void DrawTriangle(Vector2 v0, Vector2 v1, Vector2 v2, Material mat, bool isFill = false)
@@ -222,6 +271,53 @@ public static class GraphicsTool {
 
             GL.Vertex(v2);
             GL.Vertex(v0);
+
+            GL.End();
+        }
+        
+        GL.PopMatrix();
+    }
+
+    public static void DrawPolygon(List<Vector2> points, Material mat, bool wrap = true, bool isFill = false)
+    {
+        mat.SetPass(0);
+
+        GL.PushMatrix();
+        GL.LoadPixelMatrix(); //转成屏幕坐标
+
+        if (isFill)
+        {
+            GL.Begin(GL.TRIANGLES);
+            for (int i = 2; i < points.Count; i++)
+            {
+                
+                GL.Vertex(points[i - 2]);
+                GL.Vertex(points[i - 1]);
+                GL.Vertex(points[i]);
+            }
+            if (wrap)
+            {
+                GL.Vertex(points[points.Count - 2]);
+                GL.Vertex(points[points.Count - 1]);
+                GL.Vertex(points[0]);
+            }
+            GL.End();
+        }
+        else
+        {
+            GL.Begin(GL.LINES);
+
+            for (int i = 1; i < points.Count; i++)
+            {
+                GL.Vertex(points[i - 1]);
+                GL.Vertex(points[i]);
+            }
+
+            if (wrap)
+            {
+                GL.Vertex(points[points.Count - 1]);
+                GL.Vertex(points[0]);
+            }
 
             GL.End();
         }
@@ -274,10 +370,5 @@ public static class GraphicsTool {
         }
 
         GL.PopMatrix();
-    }
-
-    public static void DrawPolygon(List<Vector2> points, Material mat, bool wrap = true, bool isFill = false)
-    {
-        DrawPolygon(points.ToArray(), mat, wrap, isFill);
     }
 }

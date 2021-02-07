@@ -9,6 +9,7 @@ Many pathfinding algorithm
   * Grid
   * Navmesh
   * Visibility Graph
+    * CircleVisibilityGraph
 
 
 
