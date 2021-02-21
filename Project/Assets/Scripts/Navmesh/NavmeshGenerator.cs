@@ -88,7 +88,7 @@ namespace Pathfinding.Navmesh
 		/// <returns></returns>
 		private static List<DelaunayTriangle> GenerateTriangles(List<List<IntPoint>> polygons)
 		{
-			//顺时针为可走区域，逆时针为阻挡（孔洞）
+			//根据时针方向判断可走区域和障碍
 			var walkables = new List<Polygon>();
 			var blockeds = new List<Polygon>();
 			for (int i = 0; i < polygons.Count; i++)
